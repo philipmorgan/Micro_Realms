@@ -19,7 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "console.h"
 #include "realm.h"
-#include <stdlib.h> // contains definition for random
+#include <stdio.h>
+#include <time.h>
 // Find types: h(ealth),s(trength),m(agic),g(old),w(eapon)
 const char FindTypes[]={'h','s','m','g','w'};
 
@@ -41,9 +42,41 @@ int GameStarted = 0;
 tPlayer thePlayer;
 tRealm theRealm;
 void delay(int len);
+
+unsigned prbs()
+{
+	// This is an unverified 31 bit PRBS generator
+	// It should be maximum length but this has not been verified 
+	static unsigned long shift_register=0xa5a5a5a5;
+	static int Initialized=0;
+	// This is a mechanism that should pick a different prbs starting 
+	// value each run (so long as you don't run in the same second)
+	if (!Initialized)
+	{
+		shift_register=(unsigned long)time(NULL);
+		Initialized = 1;
+	}
+
+
+	unsigned long new_bit=0;
+	static int busy=0; // need to prevent re-entrancy here
+	if (!busy)
+	{
+		busy=1;
+		new_bit= ((shift_register & (1<<27))>>27) ^ ((shift_register & (1<<30))>>30);
+		new_bit= ~new_bit;
+		new_bit = new_bit & 1;
+		shift_register=shift_register << 1;
+		shift_register=shift_register | (new_bit);
+		busy=0;
+	}
+	return shift_register & 0x7ffffff; // return 31 LSB's 
+}
+
+
 unsigned range_random(unsigned range)
 {
-	return random() % (range+1);
+	return prbs() % (range+1);
 }
 void runGame(void)
 {
@@ -436,10 +469,9 @@ void initPlayer(tPlayer *Player,tRealm *theRealm)
 	eputs("Enter the player's name: ");
 	while ( (index < MAX_NAME_LEN) && (ch != '\n') && (ch != '\r'))
 	{
-		ch = getUserInput();
+		ch = getchar();//getUserInput();
 		if ( ch > '0' ) // strip conrol characters
 		{
-			
 			Player->name[index++]=ch;
 			eputc(ch);
 		}
@@ -550,8 +582,10 @@ void showGameMessage(char *Msg)
 char getUserInput()
 {
 	char ch = 0;	
-	while ((ch == 0))
-		ch = egetc();	
+	ch = getchar();
+	// need to flush out the input buffer
+	int c;
+	while ( (c = getchar()) != '\n' && c != EOF ) { }		
 	return ch;
 }
 
@@ -559,3 +593,4 @@ void zap()
 {
 	// do some special effect when someone uses a spell
 }
+

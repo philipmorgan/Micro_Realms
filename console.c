@@ -36,7 +36,7 @@ void eputs(const char *String)
 char egetc()
 {
 	char input;
-	input = getchar();	
+	input = getchar();		
 	return input;
 }
 void printString(const char *String)
