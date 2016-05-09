@@ -29,7 +29,7 @@ const char FindTypes[]={'h','s','m','g','w'};
 // their battle properies - ordering matters!
 // Baddie types : O(gre),T(roll),D(ragon),H(ag)
 const char Baddies[]={'O','T','D','H'};
-// The following is 4 sets of 4 damage types
+// The following is 4 sets of 4 damage types	
 const byte WeaponDamage[]={10,10,5,25,10,10,5,25,10,15,5,15,5,5,2,10};
 #define ICE_SPELL_COST 10
 #define FIRE_SPELL_COST 20
@@ -42,6 +42,9 @@ int GameStarted = 0;
 tPlayer thePlayer;
 tRealm theRealm;
 void delay(int len);
+
+int height = 0;
+int width = 0;
 
 unsigned prbs()
 {
@@ -82,19 +85,32 @@ void runGame(void)
 {
 	char ch;
 	
+
 	printString("MicroRealms on the LPC810.");	
 	showHelp();		
 	while(GameStarted == 0)
 	{
 		
 		showGameMessage("Press S to start a new game");
-		ch = getUserInput();			
+		ch = getUserInput();
+
+
+		showGameMessage("Enter map height");
+		height = getMapSize();
+
+
+		showGameMessage("Enter map width");
+		width = getMapSize();		
+		
+	
+	
+		
 		
 		if ( (ch == 'S') || (ch == 's') )
 			GameStarted = 1;
 	}
 	
-	initRealm(&theRealm);	
+	initRealm(&theRealm);
 	initPlayer(&thePlayer,&theRealm);
 	showPlayer(&thePlayer);
 	showRealm(&theRealm,&thePlayer);
@@ -162,13 +178,13 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 		}
 		case 's' :
 		{
-			if (new_y < MAP_HEIGHT-1)
+			if (new_y < height-1)
 				new_y++;
 			break;
 		}
 		case 'e' :
 		{
-			if (new_x <  MAP_WIDTH-1)
+			if (new_x <  width-1)
 				new_x++;
 			break;
 		}
@@ -246,7 +262,7 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 			// Player landed on the exit
 			printString("A door! You exit into a new realm");
 			setHealth(Player,100); // maximize health
-			initRealm(&theRealm);
+			//initRealm(&theRealm);
 			showRealm(&theRealm,Player);
 		}
 	}
@@ -461,6 +477,7 @@ void setStrength(tPlayer *Player, byte strength)
 }
 void initPlayer(tPlayer *Player,tRealm *theRealm)
 {
+	
 	// get the player name
 	int index=0;
 	byte x,y;
@@ -487,8 +504,8 @@ void initPlayer(tPlayer *Player,tRealm *theRealm)
 	// Make sure the player does not land
 	// on an occupied space to begin with
 	do {
-		x=range_random(MAP_WIDTH);
-		y=range_random(MAP_HEIGHT);
+		x=range_random(width);
+		y=range_random(height);
 		
 	} while(theRealm->map[y][x] != '.');
 	Player->x=x;
@@ -519,10 +536,12 @@ void initRealm(tRealm *Realm)
 {
 	int x,y;
 	int Rnd;
+	
+
 	// clear the map to begin with
-	for (y=0;y < MAP_HEIGHT; y++)
+	for (y=0;y < height; y++)
 	{
-		for (x=0; x < MAP_WIDTH; x++)
+		for (x=0; x < width; x++)
 		{
 			Rnd = range_random(100);
 			
@@ -538,17 +557,17 @@ void initRealm(tRealm *Realm)
 	}
 	
 	// finally put the exit to the next level in
-	x = range_random(MAP_WIDTH);
-	y = range_random(MAP_HEIGHT);
+	x = range_random(width);
+	y = range_random(height);
 	Realm->map[y][x]='X';
 }
 void showRealm(tRealm *Realm,tPlayer *thePlayer)
 {
 	int x,y;
 	printString("The Realm:");	
-	for (y=0;y<MAP_HEIGHT;y++)
+	for (y=0;y<height;y++)
 	{
-		for (x=0;x<MAP_WIDTH;x++)
+		for (x=0;x<width;x++)
 		{
 			
 			if ( (x==thePlayer->x) && (y==thePlayer->y))
@@ -587,6 +606,24 @@ char getUserInput()
 	int c;
 	while ( (c = getchar()) != '\n' && c != EOF ) { }		
 	return ch;
+}
+
+int getMapSize() // customizable map min: 5x5, max: 40x40
+{
+	
+	int value = 0;		
+	scanf("%d",&value); 	//get int value from console
+	
+	if (value < 5 || value > 40){
+		showGameMessage("Invalid map size, please enter number between 5 and 40");
+		getMapSize();
+	}
+	else{
+		fflush (stdin);	//flush buffer
+		return value;
+
+	}	
+
 }
 
 void zap()

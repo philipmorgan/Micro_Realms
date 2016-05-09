@@ -19,7 +19,7 @@ OBJS= console.o	main.o realm.o
 # The default 'target' (output) is main.elf and it depends on the object files being there.
 # These object files are linked together to create main.elf
 main.elf : $(OBJS)
-	gcc $(OBJS) $(LDFLAGS) -o microrealms	
+	gcc $(OBJS) $(LDFLAGS) -o microrealms.exe	
 	@echo "Assuming all went well..."
 	@echo "run the program with ./microrealms"	
 # The object file main.o depends on maiqn.c.  main.c is compiled to make main.o
@@ -37,4 +37,4 @@ realm.o: realm.c
 # associated wit this project
 clean: 
 	rm $(OBJS) 
-	rm microrealms
+	rm microrealms.exe
