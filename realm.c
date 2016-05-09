@@ -45,6 +45,7 @@ void delay(int len);
 
 int height = 0;
 int width = 0;
+char level;
 
 unsigned prbs()
 {
@@ -100,7 +101,10 @@ void runGame(void)
 
 
 		showGameMessage("Enter map width");
-		width = getMapSize();		
+		width = getMapSize();	
+
+		showGameMessage("Select gameplay level: beginner (b), normal (n), expert (e)");
+		level = getUserInput();
 		
 	
 	
@@ -538,23 +542,93 @@ void initRealm(tRealm *Realm)
 	int Rnd;
 	
 
+	if ( (level == 'B') || (level == 'b') ){		//beginner user level
 	// clear the map to begin with
-	for (y=0;y < height; y++)
-	{
-		for (x=0; x < width; x++)
+		for (y=0;y < height; y++)
 		{
-			Rnd = range_random(100);
-			
-			if (Rnd >= 98) // put in some baddies
-				Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
-			else if (Rnd >= 95) // put in some good stuff
-				Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
-			else if (Rnd >= 90) // put in some rocks
-				Realm->map[y][x]='*'; 
-			else // put in empty space
-				Realm->map[y][x] = '.';	
+			for (x=0; x < width; x++)
+			{
+				Rnd = range_random(100);
+				
+				if (Rnd >= 98) // put in some baddies
+					Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
+				else if (Rnd >= 93) // put in some good stuff
+					Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
+				else if (Rnd >= 90) // put in some rocks
+					Realm->map[y][x]='*'; 
+				else // put in empty space
+					Realm->map[y][x] = '.';	
+			}
 		}
 	}
+	
+	else if ( (level == 'N') || (level == 'n') ){	//normal user level
+		
+		// clear the map to begin with
+		for (y=0;y < height; y++)
+		{
+			for (x=0; x < width; x++)
+			{
+				Rnd = range_random(100);
+				
+				if (Rnd >= 97) // put in some baddies
+					Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
+				else if (Rnd >= 92) // put in some good stuff
+					Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
+				else if (Rnd >= 87) // put in some rocks
+					Realm->map[y][x]='*'; 
+				else // put in empty space
+					Realm->map[y][x] = '.';	
+			}
+		}
+	}
+	
+	else if ( (level == 'E') || (level == 'e') ){	//expert user level
+		
+		// clear the map to begin with
+		for (y=0;y < height; y++)
+		{
+			for (x=0; x < width; x++)
+			{
+				Rnd = range_random(100);
+				
+				if (Rnd >= 92) // put in some baddies
+					Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
+				else if (Rnd >= 89) // put in some good stuff
+					Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
+				else if (Rnd >= 81) // put in some rocks
+					Realm->map[y][x]='*'; 
+				else // put in empty space
+					Realm->map[y][x] = '.';	
+			}
+		}
+	}
+	
+	else		
+	{	printf("Invalid user level selected\n");
+		printf("Defaulting to normal level\n");
+		// clear the map to begin with
+		// clear the map to begin with
+		for (y=0;y < height; y++)				//default to normal user level if invalid input
+		{
+			for (x=0; x < width; x++)
+			{
+				Rnd = range_random(100);
+				
+				if (Rnd >= 95) // put in some baddies
+					Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
+				else if (Rnd >= 93) // put in some good stuff
+					Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
+				else if (Rnd >= 88) // put in some rocks
+					Realm->map[y][x]='*'; 
+				else // put in empty space
+					Realm->map[y][x] = '.';	
+			}
+		}
+	}
+	
+	
+	
 	
 	// finally put the exit to the next level in
 	x = range_random(width);
