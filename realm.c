@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <stdio.h>
 #include <time.h>
 #include <windows.h>
-//#include <WinUser.h>
+
 
 // Find types: h(ealth),s(trength),m(agic),g(old),w(eapon)
 const char FindTypes[]={'h','s','m','g','w'};
@@ -371,8 +371,9 @@ int doChallenge(tPlayer *Player,int BadGuyIndex)
 				BadGuyHealth = 0;
 			Damage = BadGuyDamage[BadGuyIndex]+range_random(5);
 			setHealth(Player,Player->health - Damage);
-			eputs("Health: you "); printHex(Player->health);
-			eputs(", them " );printHex(BadGuyHealth);
+			printf("Health: You %d %%", (Player->health));		//Display Health in %
+			printf(", Them %d %%", (BadGuyHealth));				//Display Health in %
+			
 			eputs("\r\n");
 		}
 		if (Player->health == 0)
