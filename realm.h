@@ -38,4 +38,6 @@ void setStrength(tPlayer *Player, byte strength);
 int addWeapon(tPlayer *Player, int Weapon);
 int doChallenge(tPlayer *Player, int BadGuyIndex);
 const char *getWeaponName(int index);
-void zap(void);
+void zap1(void);
+void zap2(void);
+void zap3(void);

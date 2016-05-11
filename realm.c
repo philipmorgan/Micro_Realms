@@ -21,6 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "realm.h"
 #include <stdio.h>
 #include <time.h>
+#include <windows.h>
+//#include <WinUser.h>
+
 // Find types: h(ealth),s(trength),m(agic),g(old),w(eapon)
 const char FindTypes[]={'h','s','m','g','w'};
 
@@ -313,7 +316,7 @@ int doChallenge(tPlayer *Player,int BadGuyIndex)
 					printString("FREEZE!");
 					Player->magic -= ICE_SPELL_COST;
 					BadGuyHealth -= FreezeSpellDamage[BadGuyIndex]+range_random(10);
-					zap();
+					zap1();
 					break;
 				}
 				case 'f':
@@ -322,7 +325,7 @@ int doChallenge(tPlayer *Player,int BadGuyIndex)
 					printString("BURN!");
 					Player->magic -= FIRE_SPELL_COST;
 					BadGuyHealth -= FireSpellDamage[BadGuyIndex]+range_random(10);
-					zap();
+					zap2();
 					break;
 				}
 				case 'l':
@@ -331,7 +334,7 @@ int doChallenge(tPlayer *Player,int BadGuyIndex)
 					printString("ZAP!");
 					Player->magic -= LIGHTNING_SPELL_COST;
 					BadGuyHealth -= LightningSpellDamage[BadGuyIndex]+range_random(10);
-					zap();
+					zap3();
 					break;
 				}
 				case '1':
@@ -700,8 +703,23 @@ int getMapSize() // customizable map min: 5x5, max: 40x40
 
 }
 
-void zap()
+void zap1()		// Play Sounds When Using Spells
 {
-	// do some special effect when someone uses a spell
+	
+	MessageBeep(-1);
+	
 }
 
+void zap2()
+{
+	
+	MessageBeep(0x00000010L);
+		
+}
+
+void zap3()
+{
+	
+	puts("\a");
+	 	
+}
