@@ -36,10 +36,10 @@ const byte WeaponDamage[]={10,10,5,25,10,10,5,25,10,15,5,15,5,5,2,10};
 #define ICE_SPELL_COST 10
 #define FIRE_SPELL_COST 20
 #define LIGHTNING_SPELL_COST 30
-const byte FreezeSpellDamage[]={10,20,5,0};
-const byte FireSpellDamage[]={20,10,5,0};
-const byte LightningSpellDamage[]={15,10,25,0};
-const byte BadGuyDamage[]={10,10,15,5};
+const byte FreezeSpellDamage[]={10,20,5,0,0};
+const byte FireSpellDamage[]={20,10,5,0,50};
+const byte LightningSpellDamage[]={15,10,25,0,40};
+const byte BadGuyDamage[]={10,10,15,5,20};
 int GameStarted = 0;
 tPlayer thePlayer;
 tRealm theRealm;
