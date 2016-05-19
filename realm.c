@@ -1,6 +1,7 @@
+
 /*
 Copyright (C) 2014  Frank Duignan
-//
+
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
@@ -20,27 +21,33 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "realm.h"
 #include <stdio.h>
 #include <time.h>
+#include <windows.h>
+
 // Find types: h(ealth),s(trength),m(agic),g(old),w(eapon)
-const char FindTypes[]={'h','s','m','g','w','A'};
+const char FindTypes[]={'h','s','m','g','w'};
 
 
 // The following arrays define the bad guys and 
 // their battle properies - ordering matters!
-// Baddie types : O(gre),T(roll),D(ragon),H(ag)
-const char Baddies[]={'O','T','D','H'};
-// The following is 4 sets of 4 damage types
+// Baddie types : O(gre),T(roll),D(ragon),H(ag), W(hitewalker)
+const char Baddies[]={'O','T','D','H','W'};
+// The following is 4 sets of 4 damage types	
 const byte WeaponDamage[]={10,10,5,25,10,10,5,25,10,15,5,15,5,5,2,10};
 #define ICE_SPELL_COST 10
 #define FIRE_SPELL_COST 20
 #define LIGHTNING_SPELL_COST 30
-const byte FreezeSpellDamage[]={10,20,5,0};
-const byte FireSpellDamage[]={20,10,5,0};
-const byte LightningSpellDamage[]={15,10,25,0};
-const byte BadGuyDamage[]={10,10,15,5};
+const byte FreezeSpellDamage[]={10,20,15,0,0};
+const byte FireSpellDamage[]={20,10,0,0,50};
+const byte LightningSpellDamage[]={15,10,25,0,40};
+const byte BadGuyDamage[]={10,10,15,5,20};
 int GameStarted = 0;
 tPlayer thePlayer;
 tRealm theRealm;
 void delay(int len);
+
+int height = 0;
+int width = 0;
+char level;
 
 unsigned prbs()
 {
@@ -81,19 +88,35 @@ void runGame(void)
 {
 	char ch;
 	
+
 	printString("MicroRealms on the LPC810.");	
 	showHelp();		
 	while(GameStarted == 0)
 	{
 		
 		showGameMessage("Press S to start a new game");
-		ch = getUserInput();			
+		ch = getUserInput();
+
+
+		showGameMessage("Enter map height");
+		height = getMapSize();
+
+
+		showGameMessage("Enter map width");
+		width = getMapSize();	
+
+		showGameMessage("Select gameplay level: beginner (b), normal (n), expert (e)");
+		level = getUserInput();
+		
+	
+	
+		
 		
 		if ( (ch == 'S') || (ch == 's') )
 			GameStarted = 1;
 	}
 	
-	initRealm(&theRealm);	
+	initRealm(&theRealm);
 	initPlayer(&thePlayer,&theRealm);
 	showPlayer(&thePlayer);
 	showRealm(&theRealm,&thePlayer);
@@ -161,13 +184,13 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 		}
 		case 's' :
 		{
-			if (new_y < MAP_HEIGHT-1)
+			if (new_y < height-1)
 				new_y++;
 			break;
 		}
 		case 'e' :
 		{
-			if (new_x <  MAP_WIDTH-1)
+			if (new_x <  width-1)
 				new_x++;
 			break;
 		}
@@ -190,7 +213,6 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 	switch (AreaContents)
 	{
 		
-		// const char Baddies[]={'O','T','B','H'};
 		case 'O' :{
 			showGameMessage("A smelly green Ogre appears before you");
 			Consumed = doChallenge(Player,0);
@@ -211,23 +233,17 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 			Consumed = doChallenge(Player,3);
 			break;
 		}
+		case 'W' :{
+			showGameMessage("An Icy Whitewalker appears from the mist");
+			Consumed = doChallenge(Player,4);
+			break;
+		}
 		case 'h' :{
 			showGameMessage("You find an elixer of health");
 			setHealth(Player,Player->health+10);
 			Consumed = 1;		
 			break;
 			
-		}
-		case 'A' :{
-			printString("YOU CAN GO ANYWHERE ON THE MAP!! \nWhere do you want to go? \nEnter x coordinate:");
-			int xpos = getUserInput();
-			int new_xp = xpos;
-			printString("Enter y coordinate:");
-			int ypos = getUserInput();
-			int new_yp = ypos;
-			Player->x = new_xp;
-			Player->y = new_yp;	
-			break;
 		}
 		case 's' :{
 			showGameMessage("You find a potion of strength");
@@ -256,7 +272,7 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 			// Player landed on the exit
 			printString("A door! You exit into a new realm");
 			setHealth(Player,100); // maximize health
-			initRealm(&theRealm);
+			//initRealm(&theRealm);
 			showRealm(&theRealm,Player);
 		}
 	}
@@ -303,7 +319,7 @@ int doChallenge(tPlayer *Player,int BadGuyIndex)
 					printString("FREEZE!");
 					Player->magic -= ICE_SPELL_COST;
 					BadGuyHealth -= FreezeSpellDamage[BadGuyIndex]+range_random(10);
-					zap();
+					zap1();
 					break;
 				}
 				case 'f':
@@ -312,7 +328,7 @@ int doChallenge(tPlayer *Player,int BadGuyIndex)
 					printString("BURN!");
 					Player->magic -= FIRE_SPELL_COST;
 					BadGuyHealth -= FireSpellDamage[BadGuyIndex]+range_random(10);
-					zap();
+					zap2();
 					break;
 				}
 				case 'l':
@@ -321,7 +337,7 @@ int doChallenge(tPlayer *Player,int BadGuyIndex)
 					printString("ZAP!");
 					Player->magic -= LIGHTNING_SPELL_COST;
 					BadGuyHealth -= LightningSpellDamage[BadGuyIndex]+range_random(10);
-					zap();
+					zap3();
 					break;
 				}
 				case '1':
@@ -358,14 +374,15 @@ int doChallenge(tPlayer *Player,int BadGuyIndex)
 				BadGuyHealth = 0;
 			Damage = BadGuyDamage[BadGuyIndex]+range_random(5);
 			setHealth(Player,Player->health - Damage);
-			eputs("Health: you "); printHex(Player->health);
-			eputs(", them " );printHex(BadGuyHealth);
+			printf("Health: You %d %%", (Player->health));		//Display Health in %
+			printf(", Them %d %%", (BadGuyHealth));				//Display Health in %
+			
 			eputs("\r\n");
 		}
 		if (Player->health == 0)
 		{ // You died
-			printString("You are dead.");
-			return 0;
+			printString("You are dead. Press Reset to restart");
+			while(1);
 		}
 		else
 		{ // You won!
@@ -389,17 +406,17 @@ int addWeapon(tPlayer *Player, int Weapon)
 	{
 		case 1:
 		{	
-			printString("a mighty axe");
+			printString("A Mighty Axe");
 			break;
 		}
 		case 2:
 		{	
-			printString("a sword with mystical runes");
+			printString("An Ancient Valyrian Sword!");
 			break;
 		}
 		case 3:
 		{	
-			printString("a bloody flail");
+			printString("A Bloody Flail");
 			break;
 		}		
 		default:
@@ -471,6 +488,7 @@ void setStrength(tPlayer *Player, byte strength)
 }
 void initPlayer(tPlayer *Player,tRealm *theRealm)
 {
+	
 	// get the player name
 	int index=0;
 	byte x,y;
@@ -497,8 +515,8 @@ void initPlayer(tPlayer *Player,tRealm *theRealm)
 	// Make sure the player does not land
 	// on an occupied space to begin with
 	do {
-		x=range_random(MAP_WIDTH);
-		y=range_random(MAP_HEIGHT);
+		x=range_random(width);
+		y=range_random(height);
 		
 	} while(theRealm->map[y][x] != '.');
 	Player->x=x;
@@ -529,36 +547,108 @@ void initRealm(tRealm *Realm)
 {
 	int x,y;
 	int Rnd;
+	
+
+	if ( (level == 'B') || (level == 'b') ){		//beginner user level
 	// clear the map to begin with
-	for (y=0;y < MAP_HEIGHT; y++)
-	{
-		for (x=0; x < MAP_WIDTH; x++)
+		for (y=0;y < height; y++)
 		{
-			Rnd = range_random(100);
-			
-			if (Rnd >= 98) // put in some baddies
-				Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
-			else if (Rnd >= 95) // put in some good stuff
-				Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
-			else if (Rnd >= 90) // put in some rocks
-				Realm->map[y][x]='*'; 
-			else // put in empty space
-				Realm->map[y][x] = '.';	
+			for (x=0; x < width; x++)
+			{
+				Rnd = range_random(100);
+				
+				if (Rnd >= 98) // put in some baddies
+					Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
+				else if (Rnd >= 93) // put in some good stuff
+					Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
+				else if (Rnd >= 90) // put in some rocks
+					Realm->map[y][x]='*'; 
+				else // put in empty space
+					Realm->map[y][x] = '.';	
+			}
 		}
 	}
 	
+	else if ( (level == 'N') || (level == 'n') ){	//normal user level
+		
+		// clear the map to begin with
+		for (y=0;y < height; y++)
+		{
+			for (x=0; x < width; x++)
+			{
+				Rnd = range_random(100);
+				
+				if (Rnd >= 97) // put in some baddies
+					Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
+				else if (Rnd >= 92) // put in some good stuff
+					Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
+				else if (Rnd >= 87) // put in some rocks
+					Realm->map[y][x]='*'; 
+				else // put in empty space
+					Realm->map[y][x] = '.';	
+			}
+		}
+	}
+	
+	else if ( (level == 'E') || (level == 'e') ){	//expert user level
+		
+		// clear the map to begin with
+		for (y=0;y < height; y++)
+		{
+			for (x=0; x < width; x++)
+			{
+				Rnd = range_random(100);
+				
+				if (Rnd >= 92) // put in some baddies
+					Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
+				else if (Rnd >= 89) // put in some good stuff
+					Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
+				else if (Rnd >= 81) // put in some rocks
+					Realm->map[y][x]='*'; 
+				else // put in empty space
+					Realm->map[y][x] = '.';	
+			}
+		}
+	}
+	
+	else		
+	{	printf("Invalid user level selected\n");
+		printf("Defaulting to normal level\n");
+		// clear the map to begin with
+		// clear the map to begin with
+		for (y=0;y < height; y++)				//default to normal user level if invalid input
+		{
+			for (x=0; x < width; x++)
+			{
+				Rnd = range_random(100);
+				
+				if (Rnd >= 95) // put in some baddies
+					Realm->map[y][x]=	Baddies[range_random(sizeof(Baddies))];
+				else if (Rnd >= 93) // put in some good stuff
+					Realm->map[y][x]=	FindTypes[range_random(sizeof(FindTypes))];
+				else if (Rnd >= 88) // put in some rocks
+					Realm->map[y][x]='*'; 
+				else // put in empty space
+					Realm->map[y][x] = '.';	
+			}
+		}
+	}
+	
+	
+	
+	
 	// finally put the exit to the next level in
-	x = range_random(MAP_WIDTH);
-	y = range_random(MAP_HEIGHT);
+	x = range_random(width);
+	y = range_random(height);
 	Realm->map[y][x]='X';
 }
 void showRealm(tRealm *Realm,tPlayer *thePlayer)
 {
 	int x,y;
 	printString("The Realm:");	
-	for (y=0;y<MAP_HEIGHT;y++)
+	for (y=0;y<height;y++)
 	{
-		for (x=0;x<MAP_WIDTH;x++)
+		for (x=0;x<width;x++)
 		{
 			
 			if ( (x==thePlayer->x) && (y==thePlayer->y))
@@ -569,7 +659,7 @@ void showRealm(tRealm *Realm,tPlayer *thePlayer)
 		eputs("\r\n");
 	}
 	printString("\r\nLegend");
-	printString("(T)roll, (O)gre, (D)ragon, (H)ag, e(X)it");
+	printString("(T)roll, (O)gre, (D)ragon, (H)ag, (W)hitewalker, e(X)it");
 	printString("(w)eapon, (g)old), (m)agic, (s)trength");
 	printString("@=You");
 }
@@ -599,8 +689,35 @@ char getUserInput()
 	return ch;
 }
 
-void zap()
+int getMapSize() // customizable map min: 5x5, max: 40x40
 {
-	// do some special effect when someone uses a spell
+	
+	int value = 0;		
+	scanf("%d",&value); 	//get int value from console
+	
+	if (value < 5 || value > 40){
+		showGameMessage("Invalid map size, please enter number between 5 and 40");
+		getMapSize();
+	}
+	else{
+		fflush (stdin);	//flush buffer
+		return value;
+
+	}	
+
 }
 
+void zap1()		// Play Sounds When Using Spells
+{
+	MessageBeep(-1);
+}
+
+void zap2()
+{	
+	MessageBeep(0x00000010L);
+}
+
+void zap3()
+{	
+	puts("\a");
+}

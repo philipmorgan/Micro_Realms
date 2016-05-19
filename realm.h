@@ -1,17 +1,16 @@
 // realm.h
 // Some game constants
-#define MAP_WIDTH 40
-#define MAP_HEIGHT 40
+//#define MAP_WIDTH 30
+//#define MAP_HEIGHT 20
 #define MAX_NAME_LEN 20
 #define MAX_WEAPONS 4
 
-typedef unsigned char byte;
 
-typedef struct 
-{
-	byte map[MAP_HEIGHT][MAP_WIDTH];
-} 
-tRealm;
+typedef unsigned char byte;
+typedef struct {
+	byte map[40][40];
+	
+} tRealm;
 typedef struct {
 	char name[MAX_NAME_LEN+1];
 	byte health;	
@@ -39,4 +38,6 @@ void setStrength(tPlayer *Player, byte strength);
 int addWeapon(tPlayer *Player, int Weapon);
 int doChallenge(tPlayer *Player, int BadGuyIndex);
 const char *getWeaponName(int index);
-void zap(void);
+void zap1(void);
+void zap2(void);
+void zap3(void);
