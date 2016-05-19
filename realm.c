@@ -23,15 +23,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <time.h>
 #include <windows.h>
 
-
 // Find types: h(ealth),s(trength),m(agic),g(old),w(eapon)
 const char FindTypes[]={'h','s','m','g','w'};
 
 
 // The following arrays define the bad guys and 
 // their battle properies - ordering matters!
-// Baddie types : O(gre),T(roll),D(ragon),H(ag)
-const char Baddies[]={'O','T','D','H'};
+// Baddie types : O(gre),T(roll),D(ragon),H(ag), W(hitewalker)
+const char Baddies[]={'O','T','D','H','W'};
 // The following is 4 sets of 4 damage types	
 const byte WeaponDamage[]={10,10,5,25,10,10,5,25,10,15,5,15,5,5,2,10};
 #define ICE_SPELL_COST 10
@@ -214,7 +213,6 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 	switch (AreaContents)
 	{
 		
-		// const char Baddies[]={'O','T','B','H'};
 		case 'O' :{
 			showGameMessage("A smelly green Ogre appears before you");
 			Consumed = doChallenge(Player,0);
@@ -233,6 +231,11 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 		case 'H' :{
 			showGameMessage("A withered hag cackles at you wickedly");
 			Consumed = doChallenge(Player,3);
+			break;
+		}
+		case 'W' :{
+			showGameMessage("An Icy Whitewalker appears from the mist");
+			Consumed = doChallenge(Player,4);
 			break;
 		}
 		case 'h' :{
@@ -656,7 +659,7 @@ void showRealm(tRealm *Realm,tPlayer *thePlayer)
 		eputs("\r\n");
 	}
 	printString("\r\nLegend");
-	printString("(T)roll, (O)gre, (D)ragon, (H)ag, e(X)it");
+	printString("(T)roll, (O)gre, (D)ragon, (H)ag, (W)hitewalker, e(X)it");
 	printString("(w)eapon, (g)old), (m)agic, (s)trength");
 	printString("@=You");
 }
