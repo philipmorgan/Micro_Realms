@@ -36,7 +36,7 @@ const byte WeaponDamage[]={10,10,5,25,10,10,5,25,10,15,5,15,5,5,2,10};
 #define ICE_SPELL_COST 10
 #define FIRE_SPELL_COST 20
 #define LIGHTNING_SPELL_COST 30
-const byte FreezeSpellDamage[]={10,20,5,0,0};
+const byte FreezeSpellDamage[]={10,20,15,0,0};
 const byte FireSpellDamage[]={20,10,0,0,50};
 const byte LightningSpellDamage[]={15,10,25,0,40};
 const byte BadGuyDamage[]={10,10,15,5,20};
@@ -406,17 +406,17 @@ int addWeapon(tPlayer *Player, int Weapon)
 	{
 		case 1:
 		{	
-			printString("a mighty axe");
+			printString("A Mighty Axe");
 			break;
 		}
 		case 2:
 		{	
-			printString("a sword with mystical runes");
+			printString("An Ancient Valyrian Sword!");
 			break;
 		}
 		case 3:
 		{	
-			printString("a bloody flail");
+			printString("A Bloody Flail");
 			break;
 		}		
 		default:
@@ -709,21 +709,15 @@ int getMapSize() // customizable map min: 5x5, max: 40x40
 
 void zap1()		// Play Sounds When Using Spells
 {
-	
 	MessageBeep(-1);
-	
 }
 
 void zap2()
-{
-	
+{	
 	MessageBeep(0x00000010L);
-		
 }
 
 void zap3()
-{
-	
+{	
 	puts("\a");
-	 	
 }
