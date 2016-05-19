@@ -16,5 +16,3 @@ void eputs(const char *s);
 void printString(const char *s);
 void printHex(unsigned int Number);
 void flushinput();
-
-
