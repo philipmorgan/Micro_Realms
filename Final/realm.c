@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #endif
 
 // Find types: h(ealth),s(trength),m(agic),g(old),w(eapon)
-const char FindTypes[]={'h','s','m','g','w'};
+const char FindTypes[]={'h','s','m','g','w','A'};
 
 
 // The following arrays define the bad guys and 
@@ -247,6 +247,17 @@ void step(char Direction,tPlayer *Player,tRealm *Realm)
 			break;
 			
 		}
+		case 'A' :{
+			printString("YOU CAN GO ANYWHERE ON THE MAP!! \nWhere do you want to go? \nEnter x coordinate:");
+			int xpos = getUserInput();
+			int new_xp = xpos;
+			printString("Enter y coordinate:");
+			int ypos = getUserInput();
+			int new_yp = ypos;
+			Player->x = new_xp;
+			Player->y = new_yp;	
+			break;
+			}
 		case 's' :{
 			showGameMessage("You find a potion of strength");
 			Consumed = 1;
@@ -668,7 +679,7 @@ void showRealm(tRealm *Realm,tPlayer *thePlayer)
 	}
 	printString("\r\nLegend");
 	printString("(T)roll, (O)gre, (D)ragon, (H)ag, (W)hitewalker, e(X)it");
-	printString("(w)eapon, (g)old), (m)agic, (s)trength");
+	printString("(w)eapon, (g)old), (m)agic, (s)trength (A)nywhere");
 	printString("@=You");
 }
 void showHelp()
